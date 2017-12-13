@@ -5,6 +5,7 @@ namespace App\Tasks\Thrift;
 use App\Core\Cli\Task\Socket;
 use App\Thrift\Clients\RegisterClient;
 use App\Thrift\Services\AppHandler;
+use App\Thrift\Services\MysqlHandler;
 use App\Utils\Redis;
 use App\Utils\Register\Sign;
 use Phalcon\Logger\AdapterInterface;
@@ -16,6 +17,7 @@ use swoole_server;
 use Thrift\Protocol\TBinaryProtocol;
 use Thrift\TMultiplexedProcessor;
 use Thrift\Transport\TMemoryBuffer;
+use Xin\Thrift\MysqlService\MysqlProcessor;
 use Xin\Thrift\Register\ServiceInfo;
 use swoole_process;
 
@@ -116,8 +118,8 @@ class ServiceTask extends Socket
         // dump(get_included_files()); // 查看不能被平滑重启的文件
 
         $this->processor = new TMultiplexedProcessor();
-        $handler = new AppHandler();
-        $this->processor->registerProcessor('app', new AppProcessor($handler));
+        $handler = new MysqlHandler();
+        $this->processor->registerProcessor('mysql', new MysqlProcessor($handler));
     }
 
     public function receive(swoole_server $server, $fd, $reactor_id, $data)
