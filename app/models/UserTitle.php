@@ -24,14 +24,14 @@ class UserTitle extends Model
     /**
      *
      * @var string
-     * @Column(type="string", nullable=false)
+     * @Column(type="string", nullable=true)
      */
     public $created_at;
 
     /**
      *
      * @var string
-     * @Column(type="string", nullable=false)
+     * @Column(type="string", nullable=true)
      */
     public $updated_at;
 
@@ -42,16 +42,6 @@ class UserTitle extends Model
     {
         $this->setSchema("phalcon");
         $this->setSource("user_title");
-    }
-
-    /**
-     * Returns table name mapped in the model.
-     *
-     * @return string
-     */
-    public function getSource()
-    {
-        return 'user_title';
     }
 
     /**
@@ -74,6 +64,16 @@ class UserTitle extends Model
     public static function findFirst($parameters = null)
     {
         return parent::findFirst($parameters);
+    }
+
+    /**
+     * Returns table name mapped in the model.
+     *
+     * @return string
+     */
+    public function getSource()
+    {
+        return 'user_title';
     }
 
 }
