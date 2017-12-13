@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Phalcon\Text;
+
 class Test extends Model
 {
 
@@ -35,6 +37,37 @@ class Test extends Model
     {
         $this->setSchema("phalcon");
         $this->setSource("test");
+    }
+
+    /**
+     * Dynamically selects a shard
+     *
+     * @param array $intermediate
+     * @param array $bindParams
+     * @param array $bindTypes
+     */
+    public function selectReadConnection($intermediate, $bindParams, $bindTypes)
+    {
+        // Check if there is a 'where' clause in the select
+        if (isset($intermediate['where'])) {
+            $conditions = $intermediate['where'];
+
+            // Choose the possible shard according to the conditions
+            if ($conditions['left']['name'] === 'age') {
+                $age = $conditions['right']['value'];
+                if (Text::startsWith($age, ':')) {
+                    $age = str_replace(':', '', $age);
+                    $age = $bindParams[$age];
+                }
+
+                if ($age % 2 === 0) {
+                    return $this->getDI()->get('db2');;
+                }
+                return $this->getDI()->get('db');;
+            }
+        }
+
+        throw new \Exception('无法确定connection');
     }
 
     /**

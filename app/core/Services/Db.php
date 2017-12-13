@@ -53,6 +53,41 @@ class Db implements ServiceProviderInterface
             }
             return $db;
         });
+
+        /**
+         * Database connection is created based in the parameters defined in the configuration file
+         */
+        $di->setShared('db2', function () use ($config) {
+            $db = new DbAdapter(
+                [
+                    'host' => $config->database->host,
+                    'port' => 3307,
+                    'username' => $config->database->username,
+                    'password' => $config->database->password,
+                    'dbname' => $config->database->dbname,
+                    'charset' => $config->database->charset,
+                    'options' => [
+                        PDO::ATTR_CASE => PDO::CASE_NATURAL,
+                        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                        PDO::ATTR_ORACLE_NULLS => PDO::NULL_NATURAL,
+                        PDO::ATTR_STRINGIFY_FETCHES => false,
+                        PDO::ATTR_EMULATE_PREPARES => false,
+                    ],
+                ]
+            );
+            if ($config->log->db) {
+                $eventsManager = new EventsManager();
+                // 创建一个数据库侦听
+                $dbListener = new DbListener();
+                // 侦听全部数据库事件
+                $eventsManager->attach(
+                    "db2",
+                    $dbListener
+                );
+                $db->setEventsManager($eventsManager);
+            }
+            return $db;
+        });
     }
 
 }
